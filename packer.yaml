@@ -1,0 +1,12 @@
+character_run:
+  images: raw-assets/characters/run_full/*.png
+  outDir: public/assets/atlas
+  maxWidth: 2048
+  maxHeight: 2048
+  padding: 20
+  allowRotation: true
+  square: true
+  smart: true
+  filter: linear
+  trim: true
+  pngquant: true
