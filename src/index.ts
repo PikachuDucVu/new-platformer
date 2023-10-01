@@ -49,7 +49,14 @@ const init = async () => {
     magFilter: TextureFilter.Nearest,
   });
 
+  assetManager.loadTexture("./assets/tex/back.png", "bg", {
+    minFilter: TextureFilter.Nearest,
+    magFilter: TextureFilter.Nearest,
+  });
+
   await assetManager.finishLoading();
+
+  const bg = assetManager.getTexture("bg")!;
 
   const playerSheet = assetManager.getTexture("playerSheet")!;
   const playerRegions = splitTexture(playerSheet, 6, 6, [0, 1]);
@@ -116,17 +123,20 @@ const init = async () => {
     camera.update();
     batch.setProjection(camera.combined);
     batch.begin();
-    batch.draw(white, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+    batch.draw(bg, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-    // batch.setColor(Color.GREEN);
-    // batch.draw(
-    //   white,
-    //   playerEntity.position.x,
-    //   playerEntity.position.y,
-    //   playerEntity.hitbox.width,
-    //   playerEntity.hitbox.height
-    // );
+    batch.setColor(0, 0, 0, 1);
+    for (let solid of world.getEntities(EntityType.SOLID)) {
+      batch.draw(
+        white,
+        solid.position.x,
+        solid.position.y,
+        solid.hitbox.width,
+        solid.hitbox.height
+      );
+    }
     batch.setColor(Color.WHITE);
+
     if (playerEntity.onGround) {
       onGround = true;
       if (playerEntity.speed.x === 0) {
@@ -186,19 +196,6 @@ const init = async () => {
           1
         );
     }
-    batch.setColor(Color.WHITE);
-
-    batch.setColor(0, 0, 0, 1);
-    for (let solid of world.getEntities(EntityType.SOLID)) {
-      batch.draw(
-        white,
-        solid.position.x,
-        solid.position.y,
-        solid.hitbox.width,
-        solid.hitbox.height
-      );
-    }
-    batch.setColor(Color.WHITE);
 
     batch.end();
   });
