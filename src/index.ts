@@ -7,6 +7,7 @@ import {
   PolygonBatch,
   Texture,
   TextureFilter,
+  TextureRegion,
   Vector2,
   createGameLoop,
   createStage,
@@ -62,7 +63,9 @@ const init = async () => {
   const playerRegions = splitTexture(playerSheet, 6, 6, [0, 1]);
   const idleAnimation = new Animation(playerRegions.slice(0, 4), 1 / 12);
   const runAnimation = new Animation(playerRegions.slice(6, 12), 1 / 24);
-  const jumpAnimation = new Animation(playerRegions.slice(30, 32), 1 / 12);
+  const jumpRegion = playerRegions[30];
+  const landRegion = playerRegions[31];
+  // const jumpAnimation = new Animation(playerRegions.slice(30, 32), 1 / 12);
 
   const batch = new MultiTextureBatch(gl);
   batch.setYDown(true);
@@ -137,65 +140,43 @@ const init = async () => {
     }
     batch.setColor(Color.WHITE);
 
+    let playerRegion: TextureRegion = idleAnimation.getKeyFrame(
+      playerStateTime,
+      PlayMode.LOOP
+    );
     if (playerEntity.onGround) {
       onGround = true;
       if (playerEntity.speed.x === 0) {
-        idleAnimation
-          .getKeyFrame(playerStateTime, PlayMode.LOOP)
-          .draw(
-            batch,
-            playerEntity.position.x - playerEntity.hitbox.width / 2,
-            playerEntity.position.y -
-              playerEntity.hitbox.height +
-              PLAYER_OFFSET_Y,
-            playerEntity.hitbox.width * 2,
-            playerEntity.hitbox.height * 2,
-            playerEntity.hitbox.width,
-            playerEntity.hitbox.height,
-            0,
-            playerEntity.facing === Direction.LEFT ? -1 : 1,
-            1
-          );
+        playerRegion = idleAnimation.getKeyFrame(
+          playerStateTime,
+          PlayMode.LOOP
+        );
       } else {
-        runAnimation
-          .getKeyFrame(playerStateTime, PlayMode.LOOP)
-          .draw(
-            batch,
-            playerEntity.position.x - playerEntity.hitbox.width / 2,
-            playerEntity.position.y -
-              playerEntity.hitbox.height +
-              PLAYER_OFFSET_Y,
-            playerEntity.hitbox.width * 2,
-            playerEntity.hitbox.height * 2,
-            playerEntity.hitbox.width,
-            playerEntity.hitbox.height,
-            0,
-            playerEntity.facing === Direction.LEFT ? -1 : 1,
-            1
-          );
+        playerRegion = runAnimation.getKeyFrame(playerStateTime, PlayMode.LOOP);
       }
     } else if (!playerEntity.onGround && !playerEntity.isDashing) {
       if (onGround) {
         onGround = false;
         playerStateTime = 0;
       }
-      jumpAnimation
-        .getKeyFrame(playerStateTime, PlayMode.NORMAL)
-        .draw(
-          batch,
-          playerEntity.position.x - playerEntity.hitbox.width / 2,
-          playerEntity.position.y -
-            playerEntity.hitbox.height +
-            PLAYER_OFFSET_Y,
-          playerEntity.hitbox.width * 2,
-          playerEntity.hitbox.height * 2,
-          playerEntity.hitbox.width,
-          playerEntity.hitbox.height,
-          0,
-          playerEntity.facing === Direction.LEFT ? -1 : 1,
-          1
-        );
+      if (playerEntity.speed.y > 0) {
+        playerRegion = landRegion;
+      } else {
+        playerRegion = jumpRegion;
+      }
     }
+    playerRegion.draw(
+      batch,
+      playerEntity.position.x - playerEntity.hitbox.width / 2,
+      playerEntity.position.y - playerEntity.hitbox.height + PLAYER_OFFSET_Y,
+      playerEntity.hitbox.width * 2,
+      playerEntity.hitbox.height * 2,
+      playerEntity.hitbox.width,
+      playerEntity.hitbox.height,
+      0,
+      playerEntity.facing === Direction.LEFT ? -1 : 1,
+      1
+    );
 
     batch.end();
   });
