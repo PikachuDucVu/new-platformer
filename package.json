@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "pack-atlas": "pack-atlas"
+    "pack-atlas": "pack-atlas",
+    "postinstall": "npm run fix-pngquant",
+    "fix-pngquant": "cd node_modules/pngquant-bin/ && bun i && cd ../../"
   },
   "devDependencies": {
     "pack-atlas": "^1.2.0",
