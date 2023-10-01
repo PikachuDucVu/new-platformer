@@ -1,0 +1,118 @@
+
+dust.png
+size: 128, 128
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+run
+  rotate: false
+  xy: 0, 0
+  size: 2, 1
+  orig: 52, 20
+  offset: 13, 13
+  index: 5
+run
+  rotate: false
+  xy: 22, 0
+  size: 3, 3
+  orig: 52, 20
+  offset: 12, 12
+  index: 4
+run
+  rotate: false
+  xy: 0, 23
+  size: 4, 5
+  orig: 52, 20
+  offset: 11, 13
+  index: 3
+run
+  rotate: false
+  xy: 24, 23
+  size: 7, 5
+  orig: 52, 20
+  offset: 13, 15
+  index: 2
+run
+  rotate: false
+  xy: 45, 0
+  size: 5, 2
+  orig: 52, 20
+  offset: 20, 18
+  index: 1
+jump
+  rotate: false
+  xy: 51, 22
+  size: 2, 1
+  orig: 52, 20
+  offset: 20, 1
+  index: 6
+jump
+  rotate: true
+  xy: 51, 43
+  size: 17, 11
+  orig: 52, 20
+  offset: 17, 0
+  index: 5
+jump
+  rotate: false
+  xy: 0, 48
+  size: 17, 12
+  orig: 52, 20
+  offset: 17, 0
+  index: 4
+jump
+  rotate: true
+  xy: 73, 0
+  size: 16, 12
+  orig: 52, 20
+  offset: 18, 1
+  index: 3
+jump
+  rotate: false
+  xy: 105, 0
+  size: 12, 10
+  orig: 52, 20
+  offset: 20, 6
+  index: 2
+jump
+  rotate: false
+  xy: 105, 30
+  size: 14, 7
+  orig: 52, 20
+  offset: 19, 13
+  index: 1
+fall
+  rotate: true
+  xy: 0, 80
+  size: 48, 1
+  orig: 52, 20
+  offset: 2, 13
+  index: 5
+fall
+  rotate: true
+  xy: 82, 36
+  size: 50, 3
+  orig: 52, 20
+  offset: 1, 12
+  index: 4
+fall
+  rotate: false
+  xy: 21, 106
+  size: 52, 5
+  orig: 52, 20
+  offset: 0, 13
+  index: 3
+fall
+  rotate: true
+  xy: 105, 57
+  size: 48, 5
+  orig: 52, 20
+  offset: 2, 15
+  index: 2
+fall
+  rotate: false
+  xy: 93, 125
+  size: 34, 2
+  orig: 52, 20
+  offset: 9, 18
+  index: 1

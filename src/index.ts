@@ -28,6 +28,18 @@ const WORLD_HEIGHT = 720;
 
 const SHOW_MEMORY = true;
 
+interface DustEffect {
+  type: "jump" | "run" | "land";
+  x: number;
+  y: number;
+  time: number;
+  duration: number;
+}
+
+const JUMP_DUST_DURATION = 0.5;
+const RUN_DUST_DURATION = 0.5;
+const LAND_DUST_DURATION = 0.2;
+
 const init = async () => {
   SHOW_MEMORY && (await loadMemDebugScript());
 
@@ -45,6 +57,7 @@ const init = async () => {
 
   const assetManager = new AssetManager(gl);
 
+  assetManager.loadAtlas("./assets/atlas/dust.atlas", "dust");
   assetManager.loadTexture("./assets/sheet/player.png", "playerSheet", {
     minFilter: TextureFilter.Nearest,
     magFilter: TextureFilter.Nearest,
@@ -57,8 +70,15 @@ const init = async () => {
 
   await assetManager.finishLoading();
 
-  const bg = assetManager.getTexture("bg")!;
+  const dustAtlas = assetManager.getAtlas("dust")!;
 
+  const jumpDustAnim = new Animation(dustAtlas.findRegions("jump"), 1 / 12);
+  const runDustAnim = new Animation(dustAtlas.findRegions("run"), 1 / 6);
+  const landDustAnim = new Animation(dustAtlas.findRegions("fall"), 1 / 24);
+
+  const effects: DustEffect[] = [];
+
+  const bg = assetManager.getTexture("bg")!;
   const playerSheet = assetManager.getTexture("playerSheet")!;
   const playerRegions = splitTexture(playerSheet, 6, 6, [0, 1]);
   const idleAnimation = new Animation(playerRegions.slice(0, 4), 1 / 12);
@@ -111,8 +131,18 @@ const init = async () => {
   let playerStateTime = 0;
   const PLAYER_OFFSET_Y = 2;
 
+  let accumulate = 0;
+
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   const loop = createGameLoop((delta) => {
+    for (let i = effects.length - 1; i >= 0; i--) {
+      const fx = effects[i];
+      fx.time += delta;
+      if (fx.time >= fx.duration) {
+        effects.splice(i, 1);
+        continue;
+      }
+    }
     playerStateTime += delta;
     gl.clear(gl.COLOR_BUFFER_BIT);
     PolygonBatch.resetTotalDrawCalls();
@@ -145,19 +175,47 @@ const init = async () => {
       PlayMode.LOOP
     );
     if (playerEntity.onGround) {
-      onGround = true;
+      if (!onGround) {
+        onGround = true;
+        effects.push({
+          type: "land",
+          x: playerEntity.position.x + playerEntity.hitbox.width / 2,
+          y: playerEntity.position.y + playerEntity.hitbox.height,
+          time: 0,
+          duration: LAND_DUST_DURATION,
+        });
+      }
       if (playerEntity.speed.x === 0) {
         playerRegion = idleAnimation.getKeyFrame(
           playerStateTime,
           PlayMode.LOOP
         );
+        accumulate = 0;
       } else {
         playerRegion = runAnimation.getKeyFrame(playerStateTime, PlayMode.LOOP);
+        accumulate += delta;
+        if (accumulate > 0.1) {
+          accumulate = 0;
+          effects.push({
+            type: "run",
+            x: playerEntity.position.x + playerEntity.hitbox.width / 2,
+            y: playerEntity.position.y + playerEntity.hitbox.height,
+            time: 0,
+            duration: RUN_DUST_DURATION,
+          });
+        }
       }
     } else if (!playerEntity.onGround && !playerEntity.isDashing) {
       if (onGround) {
         onGround = false;
         playerStateTime = 0;
+        effects.push({
+          type: "jump",
+          x: playerEntity.position.x + playerEntity.hitbox.width / 2,
+          y: playerEntity.position.y + playerEntity.hitbox.height,
+          time: 0,
+          duration: JUMP_DUST_DURATION,
+        });
       }
       if (playerEntity.speed.y > 0) {
         playerRegion = landRegion;
@@ -177,6 +235,22 @@ const init = async () => {
       playerEntity.facing === Direction.LEFT ? -1 : 1,
       1
     );
+
+    for (let fx of effects) {
+      if (fx.type === "jump") {
+        jumpDustAnim
+          .getKeyFrame(fx.time, PlayMode.NORMAL)
+          .draw(batch, fx.x - 26, fx.y - 10, 52, 20);
+      } else if (fx.type === "land") {
+        landDustAnim
+          .getKeyFrame(fx.time, PlayMode.NORMAL)
+          .draw(batch, fx.x - 26, fx.y - 10, 52, 20);
+      } else {
+        runDustAnim
+          .getKeyFrame(fx.time, PlayMode.NORMAL)
+          .draw(batch, fx.x - 26, fx.y - 5, 52, 20);
+      }
+    }
 
     batch.end();
   });
