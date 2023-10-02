@@ -85,6 +85,7 @@ const init = async () => {
   const runAnimation = new Animation(playerRegions.slice(6, 12), 1 / 24);
   const jumpRegion = playerRegions[30];
   const landRegion = playerRegions[31];
+  const slideRegion = playerRegions[19];
   // const jumpAnimation = new Animation(playerRegions.slice(30, 32), 1 / 12);
 
   const batch = new MultiTextureBatch(gl);
@@ -104,7 +105,7 @@ const init = async () => {
     undefined,
     {
       maxJumpCount: 2,
-      disableDash: true,
+      // disableDash: true,
       grabWallOnTouch: false,
       disableWallJump: true,
     }
@@ -150,7 +151,7 @@ const init = async () => {
     world.update(delta);
 
     camTarget.set(playerEntity.position.x, playerEntity.position.y);
-    smoothDampVec2(camPos, camTarget, vel, 0.2, Infinity, delta, camPos);
+    smoothDampVec2(camPos, camTarget, vel, 0.5, Infinity, delta, camPos);
 
     camera.setPosition(camPos.x, camPos.y);
     camera.update();
@@ -174,7 +175,7 @@ const init = async () => {
       playerStateTime,
       PlayMode.LOOP
     );
-    if (playerEntity.onGround) {
+    if (playerEntity.onGround && !playerEntity.isDashing) {
       if (!onGround) {
         onGround = true;
         effects.push({
@@ -222,6 +223,8 @@ const init = async () => {
       } else {
         playerRegion = jumpRegion;
       }
+    } else if (playerEntity.isDashing) {
+      playerRegion = slideRegion;
     }
     playerRegion.draw(
       batch,
