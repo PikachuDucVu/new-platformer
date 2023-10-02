@@ -65,9 +65,11 @@ const init = async () => {
     .findRegions("run_full");
   const kitRunAnimation = new Animation(kitRunRegions, 1 / 32);
 
+  const MAX_DELTA = 1 / 30;
   let stateTime = 0;
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   const loop = createGameLoop((delta) => {
+    delta = Math.min(delta, MAX_DELTA);
     stateTime += delta;
 
     gl.clear(gl.COLOR_BUFFER_BIT);
