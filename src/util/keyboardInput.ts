@@ -3,7 +3,7 @@ import { Controls } from "../controls";
 export const initKeyboardInputSystem = (controls: Controls) => {
   document.body.addEventListener("keydown", (ev) => {
     switch (ev.key) {
-      case "c":
+      case "x":
         if (!controls.jump.check) {
           controls.jump.pressed = true;
           controls.jump.check = true;
@@ -15,7 +15,7 @@ export const initKeyboardInputSystem = (controls: Controls) => {
       //   controls.grab.check = true;
       //   break;
 
-      case "x":
+      case "c":
         controls.dash.pressed = true;
         controls.dash.check = true;
         break;
@@ -49,7 +49,7 @@ export const initKeyboardInputSystem = (controls: Controls) => {
 
   document.documentElement.addEventListener("keyup", (ev) => {
     switch (ev.key) {
-      case "c":
+      case "x":
         controls.jump.pressed = false;
         controls.jump.check = false;
         break;
@@ -59,7 +59,7 @@ export const initKeyboardInputSystem = (controls: Controls) => {
       //   controls.grab.check = false;
       //   break;
 
-      case "x":
+      case "c":
         controls.dash.pressed = false;
         controls.dash.check = false;
         break;
