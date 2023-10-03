@@ -17,6 +17,7 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
+    "@colyseus/schema": "^2.0.16",
     "gdxts": "^0.2.24"
   }
 }

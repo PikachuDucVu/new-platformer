@@ -18,6 +18,7 @@ import { Player } from "./lib/entities/Player";
 import { Direction } from "./lib/enum/direction";
 import { EntityType, PlatformWorld } from "./lib/world";
 import mapData from "./map/test.json";
+import { PlayerState, playerToState, stateToPlayer } from "./network/state";
 import { smoothDampVec2 } from "./util/common/mathUtil";
 import { initKeyboardInputSystem } from "./util/keyboardInput";
 import { loadMemDebugScript, showDebugInfo } from "./util/mem.debug";
@@ -134,6 +135,25 @@ const init = async () => {
 
   let accumulate = 0;
 
+  let snapShot: number[] | undefined;
+  const playerState = new PlayerState();
+
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "F1") {
+      playerToState(playerEntity, playerState);
+      snapShot = playerState.encode();
+    }
+  });
+
+  document.addEventListener("keyup", (ev) => {
+    if (ev.key === "F3") {
+      if (snapShot) {
+        playerState.decode(snapShot);
+        stateToPlayer(playerState, playerEntity);
+      }
+    }
+  });
+
   gl.clearColor(0.0, 0.0, 0.0, 1.0);
   const loop = createGameLoop((delta) => {
     for (let i = effects.length - 1; i >= 0; i--) {
@@ -161,20 +181,11 @@ const init = async () => {
 
     batch.setColor(0, 0, 0, 1);
     for (let solid of world.getEntities(EntityType.SOLID)) {
-      batch.draw(
-        white,
-        solid.position.x,
-        solid.position.y,
-        solid.hitbox.width,
-        solid.hitbox.height
-      );
+      batch.draw(white, solid.position.x, solid.position.y, solid.hitbox.width, solid.hitbox.height);
     }
     batch.setColor(Color.WHITE);
 
-    let playerRegion: TextureRegion = idleAnimation.getKeyFrame(
-      playerStateTime,
-      PlayMode.LOOP
-    );
+    let playerRegion: TextureRegion = idleAnimation.getKeyFrame(playerStateTime, PlayMode.LOOP);
     if (playerEntity.onGround && !playerEntity.isDashing) {
       if (!onGround) {
         onGround = true;
@@ -187,10 +198,7 @@ const init = async () => {
         });
       }
       if (playerEntity.speed.x === 0) {
-        playerRegion = idleAnimation.getKeyFrame(
-          playerStateTime,
-          PlayMode.LOOP
-        );
+        playerRegion = idleAnimation.getKeyFrame(playerStateTime, PlayMode.LOOP);
         accumulate = 0;
       } else {
         playerRegion = runAnimation.getKeyFrame(playerStateTime, PlayMode.LOOP);
@@ -241,17 +249,11 @@ const init = async () => {
 
     for (let fx of effects) {
       if (fx.type === "jump") {
-        jumpDustAnim
-          .getKeyFrame(fx.time, PlayMode.NORMAL)
-          .draw(batch, fx.x - 26, fx.y - 10, 52, 20);
+        jumpDustAnim.getKeyFrame(fx.time, PlayMode.NORMAL).draw(batch, fx.x - 26, fx.y - 10, 52, 20);
       } else if (fx.type === "land") {
-        landDustAnim
-          .getKeyFrame(fx.time, PlayMode.NORMAL)
-          .draw(batch, fx.x - 26, fx.y - 10, 52, 20);
+        landDustAnim.getKeyFrame(fx.time, PlayMode.NORMAL).draw(batch, fx.x - 26, fx.y - 10, 52, 20);
       } else {
-        runDustAnim
-          .getKeyFrame(fx.time, PlayMode.NORMAL)
-          .draw(batch, fx.x - 26, fx.y - 5, 52, 20);
+        runDustAnim.getKeyFrame(fx.time, PlayMode.NORMAL).draw(batch, fx.x - 26, fx.y - 5, 52, 20);
       }
     }
 
