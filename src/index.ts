@@ -135,19 +135,20 @@ const init = async () => {
 
   let accumulate = 0;
 
-  let snapShot: number[] | undefined;
+  const snapShot: number[] = [];
   const playerState = new PlayerState();
 
   document.addEventListener("keydown", (ev) => {
     if (ev.key === "F1") {
       playerToState(playerEntity, playerState);
-      snapShot = playerState.encode();
+      snapShot.length = 0;
+      playerState.encode(false, snapShot, false);
     }
   });
 
   document.addEventListener("keyup", (ev) => {
     if (ev.key === "F3") {
-      if (snapShot) {
+      if (snapShot.length > 0) {
         playerState.decode(snapShot);
         stateToPlayer(playerState, playerEntity);
       }
