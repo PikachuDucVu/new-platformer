@@ -13,6 +13,8 @@ import { Player } from "./lib/entities/Player";
 import { PlatformWorld } from "./lib/world";
 import mapData from "./map/test.json";
 import { Manager } from "./system/System";
+import { Frame } from "./types";
+import { InputStore } from "./util/InputStore";
 import { loadMemDebugScript, showDebugInfo } from "./util/mem.debug";
 
 const SHOW_MEMORY = true;
@@ -86,9 +88,15 @@ const init = async () => {
     .register("batch", batch)
     .register("playerId", player)
     .register("player", playerEntity)
+    .register("frame", {
+      current: 0,
+    } as Frame)
+    .register("inputs", new InputStore())
     .register("world", world);
 
-  await import("./system/ControlSystem").then((system) => system.register(manager));
+  // initKeyboardInputSystem(controls);
+  await import("./system/ControlSystem").then((system) => system.register(manager, 10));
+  await import("./system/InputHandlingSystem").then((system) => system.register(manager));
   await import("./system/PlatformerPhysicSystem").then((system) => system.register(manager));
   await import("./system/BgRenderSystem").then((system) => system.register(manager));
   await import("./system/PlayerRenderSystem").then((system) => system.register(manager));

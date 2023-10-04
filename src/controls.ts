@@ -15,13 +15,13 @@ export class Controls {
     },
   };
 
-  // grab: Button = {
-  //   check: false,
-  //   pressed: false,
-  //   release: () => {
-  //     this.grab.pressed = false;
-  //   }
-  // };
+  grab: Button = {
+    check: false,
+    pressed: false,
+    release: () => {
+      this.grab.pressed = false;
+    },
+  };
 
   dash: Button = {
     check: false,
