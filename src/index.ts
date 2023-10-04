@@ -142,7 +142,7 @@ const init = async () => {
     if (ev.key === "F1") {
       playerToState(playerEntity, playerState);
       snapShot.length = 0;
-      playerState.encode(false, snapShot, false);
+      playerState.encode(true, snapShot, false);
     }
   });
 
