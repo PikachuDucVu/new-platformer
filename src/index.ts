@@ -29,8 +29,6 @@ const init = async () => {
 
   const gl = viewport.getContext();
   const camera = viewport.getCamera();
-  camera.zoom = 0.75;
-  camera.setYDown(true);
 
   const assetManager = new AssetManager(gl);
 

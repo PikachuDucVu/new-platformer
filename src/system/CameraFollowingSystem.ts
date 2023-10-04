@@ -12,6 +12,9 @@ export const register = (manager: GameManager) => {
     const batch = manager.context.batch;
     const camera = manager.context.camera;
 
+    camera.zoom = 0.75;
+    camera.setYDown(true);
+
     return {
       process(delta) {
         camTarget.set(playerEntity.position.x, playerEntity.position.y);

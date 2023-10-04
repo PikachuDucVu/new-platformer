@@ -10,6 +10,7 @@ export const register = (manager: GameManager) => {
   const white = Texture.createWhiteTexture(manager.context.gl);
 
   const bg = manager.context.assetManager.getTexture("bg")!;
+
   manager.addSystem(() => {
     return {
       process() {
