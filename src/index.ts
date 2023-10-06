@@ -7,7 +7,7 @@ import {
   createStage,
   createViewport,
 } from "gdxts";
-import { WORLD_HEIGHT, WORLD_WIDTH } from "./Constants";
+import { WORLD_HEIGHT, WORLD_WIDTH, getRandomInt } from "./Constants";
 import { Controls } from "./controls";
 import { Player } from "./lib/entities/Player";
 import { PlatformWorld } from "./lib/world";
@@ -16,6 +16,7 @@ import { Manager } from "./system/System";
 import { Frame } from "./types";
 import { InputStore } from "./util/InputStore";
 import { loadMemDebugScript, showDebugInfo } from "./util/mem.debug";
+import { io } from "socket.io-client";
 
 const SHOW_MEMORY = true;
 
@@ -47,6 +48,25 @@ const init = async () => {
 
   await assetManager.finishLoading();
 
+  const socket = io("ws://localhost:3000/");
+
+  socket.on("connected", () => {
+    console.log(`user ${socket.id} connected`);
+
+    socket.emit("findMatch");
+  });
+
+  let index: number | undefined = undefined;
+  let roomId: string | undefined = undefined;
+
+  socket.on("matchFound", (e) => {
+    console.log(e);
+    const { roomId: newRoomId } = e;
+    roomId = newRoomId;
+    index = e.index;
+    console.log(index);
+  });
+
   const batch = new MultiTextureBatch(gl);
   batch.setYDown(true);
 
@@ -54,7 +74,7 @@ const init = async () => {
   const world = new PlatformWorld(controls);
   const player = world.createPlayer(
     {
-      x: 100,
+      x: getRandomInt(100, 400),
       y: 500,
       width: 32,
       height: 32,
@@ -67,6 +87,7 @@ const init = async () => {
       disableWallJump: true,
     }
   );
+
   const playerEntity = world.getEntity(player)! as Player;
 
   const solidLayer = mapData.layers.find((l) => l.name === "solid")!;
@@ -92,7 +113,8 @@ const init = async () => {
       current: 0,
     } as Frame)
     .register("inputs", new InputStore())
-    .register("world", world);
+    .register("world", world)
+    .register("socket", socket);
 
   // initKeyboardInputSystem(controls);
   await import("./system/ControlSystem").then((system) => system.register(manager, 10));

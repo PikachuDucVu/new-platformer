@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@colyseus/schema": "^2.0.16",
-    "gdxts": "^0.2.24"
+    "gdxts": "^0.2.24",
+    "socket.io-client": "^4.7.2"
   }
 }
